@@ -2,7 +2,8 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:qr_flutter/qr_flutter.dart'; // Import QrImage from qr_flutter package
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:wifi_iot/wifi_iot.dart';
 
 void main() {
   runApp(
@@ -394,7 +395,6 @@ class ConnectYourDeviceToPower extends StatelessWidget {
   }
 }
 
-
 class ConnectionToWifi extends StatefulWidget {
   const ConnectionToWifi({super.key});
 
@@ -475,34 +475,24 @@ class WifiPasswordState extends State<WifiPassword> {
     final password = _passwordController.text;
     if (password.isNotEmpty && password.length >= 8) {
       try {
-        final connectionResult = await wifi_iot.WifiForIoTPlugin.connect(
-          "Your_WiFi_SSID",
-          password,
-          "WPA", // Assuming WPA security for demonstration
+        bool? connectionResult = await WiFiForIoTPlugin.connect(
+          "SSID",
+          password: "PASSWORD",
+          security: NetworkSecurity.WPA,
         );
-        if (connectionResult) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const DeviceConfirmationScreen(),
-            ),
-          );
+        if (connectionResult == true) {
+          // Successfully connected to Wi-Fi
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to connect to Wi-Fi. Please check your password.')),
-          );
+          // Failed to connect to Wi-Fi
         }
       } catch (e) {
-        if (kDebugMode) {
-          print("Error connecting to Wi-Fi: $e");
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('An error occurred while connecting to Wi-Fi. Please try again.')),
-        );
+        // Handle exception
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid Wi-Fi password (minimum length: 8 characters).')),
+        const SnackBar(
+            content: Text(
+                'Please enter a valid Wi-Fi password (minimum length: 8 characters).')),
       );
     }
   }
@@ -568,10 +558,3 @@ class DeviceConfirmationScreen extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-
-
